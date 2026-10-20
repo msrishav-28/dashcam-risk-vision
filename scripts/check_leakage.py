@@ -19,7 +19,7 @@ def main():
     assert_disjoint_clip_ids(*(part["clip_id"] for part in parts.values()))
     for _, row in df.iterrows():
         rec = row_to_record(row)
-        duration = rec.duration_s or 40.0
+        duration = rec.duration_s if rec.duration_s is not None else 40.0
         times = sample_times(duration, rec.cutoff_s(), args.n_frames)
         assert_input_before_alert(times[-1], rec)
     print("leakage checks passed", {k: v["clip_id"].nunique() for k, v in parts.items()})

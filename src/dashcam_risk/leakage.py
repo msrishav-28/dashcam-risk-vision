@@ -19,15 +19,32 @@ def assert_disjoint_clip_ids(*groups: Iterable[str]) -> None:
         seen |= ids
 
 
+def restricted_cutoff_s(record: ClipRecord) -> float | None:
+    """Cutoff that restricts model input, or None when the whole clip is legal.
+
+    An alert_time_s restricts every clip that carries one (docs/LEAKAGE.md:
+    "t_last_input_s < alert_time_s when alert exists", any label). A risk clip
+    without an alert_time falls back to its event_time_s. A normal clip's
+    duration is a sampling window, not a restriction.
+    """
+    if record.alert_time_s is not None:
+        return float(record.alert_time_s)
+    if record.is_risk and record.event_time_s is not None:
+        return float(record.event_time_s)
+    return None
+
+
 def assert_input_before_alert(
     t_last_input_s: float,
     record: ClipRecord,
     eps: float = 1e-3,
 ) -> None:
-    cutoff = record.cutoff_s()
+    cutoff = restricted_cutoff_s(record)
     if cutoff is None:
         return
-    if t_last_input_s >= cutoff - eps and record.is_risk:
+    # strictly before: a frame sampled at exactly the cutoff has already seen
+    # the onset of the event, so `>=` is rejected, not only `>`
+    if t_last_input_s >= cutoff - eps:
         raise LeakageError(
             f"{record.clip_id}: last input {t_last_input_s:.3f}s is not before "
             f"cutoff {cutoff:.3f}s"
