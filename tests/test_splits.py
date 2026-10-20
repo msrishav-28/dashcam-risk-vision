@@ -1,6 +1,11 @@
 import pandas as pd
 
-from dashcam_risk.splits import clip_level_split, holdout_by_column
+from dashcam_risk.splits import (
+    clip_level_split,
+    holdout_by_column,
+    slice_warning,
+    train_val_split,
+)
 
 
 def _toy():
@@ -32,3 +37,16 @@ def test_night_holdout():
     train, test = holdout_by_column(_toy(), "time_of_day", ["night"])
     assert set(test["time_of_day"]) == {"night"}
     assert "night" not in set(train["time_of_day"])
+
+
+def test_train_val_split_disjoint():
+    train, val = train_val_split(_toy(), seed=0, val_size=0.25)
+    ids_train, ids_val = set(train["clip_id"]), set(val["clip_id"])
+    assert ids_train.isdisjoint(ids_val)
+    assert len(ids_train) + len(ids_val) == 20
+
+
+def test_slice_warning_flags_small_slices():
+    assert slice_warning(4, floor=30) is not None
+    assert "4 clips" in slice_warning(4, floor=30)
+    assert slice_warning(30, floor=30) is None
