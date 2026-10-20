@@ -44,3 +44,44 @@ def time_to_event_mae(y_true_s: np.ndarray, y_pred_s: np.ndarray) -> float:
     if len(y_true_s) == 0:
         return float("nan")
     return float(np.mean(np.abs(y_true_s - y_pred_s)))
+
+
+def choose_threshold_f1(y_true: np.ndarray, y_score: np.ndarray) -> float:
+    """Threshold maximizing F1 on a validation set. Never fit on test.
+
+    Falls back to 0.5 when validation has one class or constant scores.
+    """
+    y_true = np.asarray(y_true).astype(int)
+    y_score = np.asarray(y_score).astype(float)
+    if len(y_true) == 0 or y_true.min() == y_true.max():
+        return 0.5
+    unique = np.unique(y_score)
+    if len(unique) < 2:
+        return 0.5
+    candidates = (unique[:-1] + unique[1:]) / 2.0
+    best_t, best_f1 = 0.5, -1.0
+    for t in candidates:
+        pred = y_score >= t
+        tp = int(np.sum(pred & (y_true == 1)))
+        fp = int(np.sum(pred & (y_true == 0)))
+        fn = int(np.sum(~pred & (y_true == 1)))
+        denom = 2 * tp + fp + fn
+        f1 = (2 * tp / denom) if denom else 0.0
+        if f1 > best_f1:
+            best_t, best_f1 = float(t), f1
+    return best_t
+
+
+def aggregate_seed_runs(per_seed: list[dict]) -> dict:
+    """Mean/std of every numeric metric across seed runs. n<2 gives std NaN."""
+    out: dict[str, dict] = {"mean": {}, "std": {}, "n_seeds": len(per_seed)}
+    if not per_seed:
+        return out
+    keys = [k for k, v in per_seed[0].items() if isinstance(v, (int, float)) and not isinstance(v, bool)]
+    for k in keys:
+        vals = np.array([row[k] for row in per_seed if k in row], dtype=float)
+        if len(vals) != len(per_seed):
+            continue  # metric absent in some seeds: not aggregatable
+        out["mean"][k] = float(vals.mean())
+        out["std"][k] = float(vals.std()) if len(vals) >= 2 else float("nan")
+    return out
