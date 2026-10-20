@@ -4,17 +4,30 @@ import torch
 from torch import nn
 
 
+class MajorityClassClassifier(nn.Module):
+    """Baseline 1: emit the training class prior. Every real model must beat this."""
+
+    def __init__(self, n_classes: int = 2):
+        super().__init__()
+        self.n_classes = n_classes
+        self.register_buffer("log_prior", torch.zeros(n_classes))
+
+    @torch.no_grad()
+    def fit_prior(self, labels: torch.Tensor) -> None:
+        counts = torch.bincount(labels.long().cpu(), minlength=self.n_classes).float()
+        probs = counts / counts.sum().clamp(min=1.0)
+        self.log_prior.copy_(probs.clamp(min=1e-6).log())
+
+    def forward(self, frames: torch.Tensor) -> torch.Tensor:
+        b = frames.shape[0]
+        return self.log_prior.unsqueeze(0).expand(b, -1)
+
+
 class LastFrameClassifier(nn.Module):
     """Baseline 2: single-frame encoder. Tiny on purpose (RTX 3050)."""
 
     def __init__(self, in_dim: int = 512, n_classes: int = 2):
         super().__init__()
-        self.backbone = nn.Sequential(
-            nn.AdaptiveAvgPool2d(1),
-            nn.Flatten(),
-            nn.Identity(),
-        )
-        self.probe_dim = in_dim
         self.head = nn.Linear(in_dim, n_classes)
 
     def forward(self, frames: torch.Tensor) -> torch.Tensor:
@@ -57,8 +70,10 @@ class FrameGRUClassifier(nn.Module):
 
 def build_model(name: str) -> nn.Module:
     name = name.lower()
+    if name == "majority":
+        return MajorityClassClassifier()
     if name in {"last_frame", "last-frame"}:
         return LastFrameClassifier()
     if name in {"gru", "frame_gru"}:
         return FrameGRUClassifier()
-    raise ValueError(f"unknown model {name}; use last_frame or gru")
+    raise ValueError(f"unknown model {name}; use majority, last_frame or gru")
