@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "placeholder_data": true,
+  "n_placeholder_tensors": 10,
+  "claim_note": "SMOKE TEST on placeholder tensors - not a result",
+  "command": "scripts/train_baseline.py --manifest data/processed/example_manifest.csv --model majority --epochs 1 --allow-placeholder --seeds 42",
+  "started_utc": "2026-10-20T17:14:44.096026+00:00",
+  "ended_utc": "2026-10-20T17:14:44.301473+00:00",
+  "config": {
+    "manifest": "data/processed/example_manifest.csv",
+    "model": "majority",
+    "epochs": 1,
+    "batch_size": 4,
+    "n_frames": 8,
+    "image_size": 224,
+    "lr": 0.001,
+    "seeds": "42",
+    "root": ".",
+    "allow_placeholder": true,
+    "holdout_column": null,
+    "holdout_values": null,
+    "val_size": 0.15,
+    "test_size": 0.2,
+    "experiments_dir": "experiments"
+  },
+  "git": {
+    "sha": "d1f702f4894520a8dfa8df4b3fa9aa5a1cb526f7",
+    "dirty": true
+  },
+  "python": "3.11.0",
+  "platform": "Windows-10-10.0.26300-SP0",
+  "libraries": {
+    "torch": "2.14.1",
+    "torchvision": "0.29.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "Pillow": "13.0.0",
+    "timm": "1.0.30"
+  },
+  "device": {
+    "name": "cpu",
+    "cuda_available": false,
+    "cuda_device": null,
+    "cpu_count": 20
+  },
+  "manifest": {
+    "path": "data/processed/example_manifest.csv",
+    "sha256": "7d661b311f588c54ec326d499eb5af20f657434916a7bf08293d729360670713",
+    "rows": 10,
+    "clip_ids": 10,
+    "license_values": [
+      "example"
+    ]
+  },
+  "splits": {
+    "mode": "random",
+    "counts": {
+      "train": {
+        "clips": 6,
+        "rows": 6,
+        "label_normal": 4,
+        "label_risk": 2
+      },
+      "val": {
+        "clips": 2,
+        "rows": 2,
+        "label_risk": 1,
+        "label_normal": 1
+      },
+      "test": {
+        "clips": 2,
+        "rows": 2,
+        "label_risk": 1,
+        "label_normal": 1
+      }
+    },
+    "hash": "edbd47b9fdbecb3ada854a2747da51d7fd25703623c08ce613ef07ed96426333",
+    "holdout": null
+  },
+  "slice_warning": null,
+  "seeds": [
+    42
+  ],
+  "per_seed": [
+    {
+      "seed": 42,
+      "split_hash": "edbd47b9fdbecb3ada854a2747da51d7fd25703623c08ce613ef07ed96426333",
+      "metrics": {
+        "val_n": 2.0,
+        "val_prevalence": 0.5,
+        "val_auprc": 0.5,
+        "val_auroc": 0.5,
+        "val_recall_lead_ge_1.0s": 0.0,
+        "val_recall_lead_ge_1.5s": 0.0,
+        "val_recall_lead_ge_2.0s": 0.0,
+        "test_n": 2.0,
+        "test_prevalence": 0.5,
+        "test_auprc": 0.5,
+        "test_auroc": 0.5,
+        "test_recall_lead_ge_1.0s": 0.0,
+        "test_recall_lead_ge_1.5s": 0.0,
+        "test_recall_lead_ge_2.0s": 0.0,
+        "threshold": 0.5,
+        "tte_mae_constant_baseline_s": 0.4375
+      },
+      "history": [
+        {
+          "epoch": 0,
+          "train_loss": 0.6365141868591309,
+          "val_auprc": 0.5
+        }
+      ]
+    }
+  ],
+  "test_metrics_aggregate": {
+    "mean": {
+      "val_n": 2.0,
+      "val_prevalence": 0.5,
+      "val_auprc": 0.5,
+      "val_auroc": 0.5,
+      "val_recall_lead_ge_1.0s": 0.0,
+      "val_recall_lead_ge_1.5s": 0.0,
+      "val_recall_lead_ge_2.0s": 0.0,
+      "test_n": 2.0,
+      "test_prevalence": 0.5,
+      "test_auprc": 0.5,
+      "test_auroc": 0.5,
+      "test_recall_lead_ge_1.0s": 0.0,
+      "test_recall_lead_ge_1.5s": 0.0,
+      "test_recall_lead_ge_2.0s": 0.0,
+      "threshold": 0.5,
+      "tte_mae_constant_baseline_s": 0.4375
+    },
+    "std": {
+      "val_n": NaN,
+      "val_prevalence": NaN,
+      "val_auprc": NaN,
+      "val_auroc": NaN,
+      "val_recall_lead_ge_1.0s": NaN,
+      "val_recall_lead_ge_1.5s": NaN,
+      "val_recall_lead_ge_2.0s": NaN,
+      "test_n": NaN,
+      "test_prevalence": NaN,
+      "test_auprc": NaN,
+      "test_auroc": NaN,
+      "test_recall_lead_ge_1.0s": NaN,
+      "test_recall_lead_ge_1.5s": NaN,
+      "test_recall_lead_ge_2.0s": NaN,
+      "threshold": NaN,
+      "tte_mae_constant_baseline_s": NaN
+    },
+    "n_seeds": 1
+  },
+  "determinism_note": "python/numpy/torch seeded per run; cudnn.deterministic=True; DataLoader shuffle uses a seeded generator; some CUDA ops are nondeterministic regardless of seeding"
+}
