@@ -1,0 +1,11 @@
+clip_id,trip_id,path,label,event_type,weather,time_of_day,scene,duration_s,fps,event_time_s,alert_time_s,license
+c000,t0,placeholder/c000.pt,risk,collision,clear,day,urban,40,30,18.0,12.0,example
+c001,t0,placeholder/c001.pt,risk,near-miss,rain,night,highway,40,30,22.0,16.0,example
+c002,t1,placeholder/c002.pt,normal,normal,clear,day,urban,40,30,,,
+c003,t1,placeholder/c003.pt,normal,normal,clear,night,rural,40,30,,,
+c004,t2,placeholder/c004.pt,risk,collision,clear,night,urban,40,30,15.0,10.0,example
+c005,t2,placeholder/c005.pt,normal,normal,rain,day,highway,40,30,,,
+c006,t3,placeholder/c006.pt,normal,normal,clear,day,urban,40,30,,,
+c007,t3,placeholder/c007.pt,risk,near-miss,clear,day,rural,40,30,20.0,14.0,example
+c008,t4,placeholder/c008.pt,normal,normal,clear,night,urban,40,30,,,
+c009,t4,placeholder/c009.pt,normal,normal,rain,night,highway,40,30,,,

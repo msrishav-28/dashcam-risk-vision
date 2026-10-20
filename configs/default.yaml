@@ -1,0 +1,10 @@
+seed: 42
+n_frames: 8
+image_size: 224
+batch_size: 4
+epochs: 10
+lr: 0.001
+model: gru
+val_size: 0.15
+test_size: 0.2
+# RTX 3050 / 4-6GB: keep T=8 and 224. Raise only after a real run logs VRAM.
