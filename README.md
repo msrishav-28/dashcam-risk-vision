@@ -34,30 +34,42 @@ pip install -r requirements.txt
 pip install -e .
 pytest -q
 python scripts/check_leakage.py --manifest data/processed/example_manifest.csv
-python scripts/train_baseline.py --manifest data/processed/example_manifest.csv --epochs 1 --model gru
+python scripts/train_baseline.py --manifest data/processed/example_manifest.csv --epochs 1 --model gru --allow-placeholder --seeds 42
 ```
 
-The example manifest has no videos. The dataset class fills **placeholder tensors**
-so the trainer and tests run before you download Nexar (or another licensed set).
-Do not quote that run as a result.
+The example manifest has no videos. Missing frame tensors make the trainer
+**fail loudly**; `--allow-placeholder` opts in to deterministic stand-in tensors
+so the machinery runs before you download Nexar (or another licensed set).
+Placeholder runs are stamped `placeholder_data: true` in the run record and
+folder name. Do not quote them as results.
 
 ## Layout
 
 ```
 docs/           QUESTION, TASK, LEAKAGE, DATA_CARD, NOT_CLAIMED
-configs/        3050-scale defaults
 src/dashcam_risk/
   schema.py     clip record + cutoff
-  leakage.py    invariants
-  splits.py     clip-level and slice holdouts
-  metrics.py    AUPRC, lead-time recall, TTE MAE
-  models.py     last-frame and frame-GRU stubs
-  dataset.py    T-frame loader
-  train.py      tiny loop that writes experiments/last_run.json
+  leakage.py    invariants (alert-time guard applies to any clip carrying alert_time_s)
+  splits.py     clip-level splits, slice holdouts, small-slice flag
+  metrics.py    AUPRC, lead-time recall, TTE MAE, threshold pick, seed aggregation
+  models.py     majority / last-frame / frame-GRU baselines
+  dataset.py    T-frame loader; placeholder tensors only with --allow-placeholder
+  train.py      seeded loop writing immutable run records under experiments/runs/
 scripts/
 tests/
 data/processed/example_manifest.csv
 ```
+
+## Run records
+
+Every train writes a new immutable folder `experiments/runs/<UTC>_<model>_<PLACEHOLDER|REAL>/run.json`
+— never overwriting earlier runs. The record carries the exact command, git SHA,
+manifest hash, split hash, seeds, per-seed metrics with mean/std across seeds,
+library versions, hardware, and timestamps. Quote numbers only from these files,
+with the `placeholder_data` field visible. See `experiments/README.md`.
+
+Domain-shift exam: add `--holdout-column time_of_day --holdout-values night` to
+evaluate on a held-out slice; slices under 30 clips are flagged unreliable.
 
 ## Data
 
